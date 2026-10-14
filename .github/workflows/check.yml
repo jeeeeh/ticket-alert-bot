@@ -2,7 +2,7 @@ name: nol-ticket-check
 
 on:
   schedule:
-    - cron: "23 * * * *"   # 1시간마다 (매시 23분)
+    - cron: "*/10 * * * *" # 10분마다 대화방 메시지 확인 (티켓 확인은 1시간에 한 번)
     - cron: "53 23 * * 0"  # 주간 안내: 매주 월요일 08:53 KST
   workflow_dispatch:
     inputs:
@@ -47,6 +47,7 @@ jobs:
         run: |
           git config user.name "ticket-bot"
           git config user.email "ticket-bot@users.noreply.github.com"
-          git add data/
+          git add data/ settings.txt
           git diff --cached --quiet || git commit -m "state"
+          git pull --rebase --autostash -q || true
           git push
