@@ -1,0 +1,52 @@
+name: nol-ticket-check
+
+on:
+  schedule:
+    - cron: "23 * * * *"   # 1시간마다 (매시 23분)
+    - cron: "53 23 * * 0"  # 주간 안내: 매주 월요일 08:53 KST
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "미리보기만 (텔레그램 발송 안 함)"
+        type: boolean
+        default: false
+      weekly:
+        description: "주간 안내 메시지 보내기"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nol-ticket-check
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: 확인
+        shell: bash
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          WEEKLY: ${{ github.event.schedule == '53 23 * * 0' || inputs.weekly }}
+        run: |
+          mkdir -p data
+          set -o pipefail
+          python -u bot.py 2>&1 | tee data/last_run.log
+      - name: 기록 저장
+        if: always()
+        run: |
+          git config user.name "ticket-bot"
+          git config user.email "ticket-bot@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet || git commit -m "state"
+          git push
