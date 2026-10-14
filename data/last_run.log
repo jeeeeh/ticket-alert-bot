@@ -5,10 +5,8 @@
    📅 12/5(토) · ⌛ 아직 회차 등록 전
 
 ━━━━━━━━━━━━━━
-⏸ 추적 그만하기 / 잠시 중단
-→ 아래 링크에서 '상태: 켜짐'을 '꺼짐'으로
-https://github.com/jeeeeh/ticket-alert-bot/edit/main/settings.txt
-
-✏️ 공연·날짜 등 조건 바꾸기
-→ 아래 링크에서 공연 링크·날짜 줄을 수정
-https://github.com/jeeeeh/ticket-alert-bot/edit/main/settings.txt
+💬 이 대화방에 이렇게 보내면 바로 바뀌어요
+⏸ 그만 보기: "중단"
+✏️ 날짜 변경: "12월 12일로 바꿔줘"
+✏️ 공연 변경: "(공연 링크) 12월 12일"
+➕ 추가: "(공연 링크) 12월 12일 추가"
