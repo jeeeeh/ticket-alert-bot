@@ -88,8 +88,9 @@ def send(text):
     if not (BOT_TOKEN and CHAT_IDS) or os.environ.get("DRY_RUN") == "true":
         return
     for cid in CHAT_IDS:
-        requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", timeout=30,
-                      json={"chat_id": cid, "text": text, "disable_web_page_preview": True})
+        r = requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", timeout=30,
+                          json={"chat_id": cid, "text": text, "disable_web_page_preview": True})
+        print("전송:", "성공" if r.ok else f"실패 {r.text[:150]}")
 
 
 # ───────── 텔레그램 대화로 설정 바꾸기 ─────────
@@ -136,12 +137,16 @@ def describe(on, targets, state):
 def handle_commands(state):
     """이 봇 대화방에 보낸 메시지를 읽어 설정을 바꾸고 답장. 바뀌면 True"""
     if not BOT_TOKEN:
+        print("! BOT_TOKEN 없음 (Secrets 확인)")
         return False
+    me = tg("getMe")
+    print("봇:", (me.get("result") or {}).get("username"), "| 받을 채팅:", len(CHAT_IDS), "곳")
     j = tg("getUpdates", offset=state.get("_tg_offset", 0), timeout=0, allowed_updates=["message"])
     if not j.get("ok"):
         print("! getUpdates:", j.get("description"))
         return False
     changed = False
+    print("새 메시지:", len(j.get("result", [])), "개")
     for up in j.get("result", []):
         state["_tg_offset"] = up["update_id"] + 1
         msg = up.get("message") or {}
